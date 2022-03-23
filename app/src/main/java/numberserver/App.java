@@ -1,8 +1,8 @@
 package numberserver;
 
 public class App {
-    private Server server;
-    public App(Server api) {
+    private AppServer server;
+    public App(AppServer api) {
         server = api;
     }
 

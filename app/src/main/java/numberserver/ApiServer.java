@@ -1,7 +1,9 @@
 package numberserver;
 
-public class ApiServer implements Server {
-    public void listen() {
-        System.out.println("hello");
+import org.eclipse.jetty.server.Server;
+
+public class ApiServer implements AppServer {
+    public String listen() {
+        return "hello";
     }
 }
