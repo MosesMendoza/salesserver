@@ -1,16 +1,29 @@
 package numberserver;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+
 public class App {
-    private AppServer server;
+    private AppServer appServer;
+
     public App(AppServer api) {
-        server = api;
+        appServer = api;
     }
 
-    public void start() {
-        server.listen();
+    public void start(Server server, ServerConnector connector, ServletContextHandler contextHandler, SalesService service) {
+        appServer.listen(server, connector, contextHandler, service);
     }
 
     public static void main(String[] args) {
-        new App(new ApiServer()).start();
+        Server server = new Server();
+        new App(new ApiServer()).start(
+            server,
+            new ServerConnector(server),
+            new ServletContextHandler(ServletContextHandler.NO_SECURITY | ServletContextHandler.NO_SESSIONS),
+            new SalesService()
+        );
     }
 }
