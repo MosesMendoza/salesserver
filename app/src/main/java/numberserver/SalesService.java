@@ -16,7 +16,7 @@ public class SalesService extends HttpServlet {
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String body = request.getReader().lines().collect(Collectors.joining());
         JSONObject jsonBody = new JSONObject(body);
-        String numberValue = jsonBody.get("number").toString();
+        String numberValue = jsonBody.get("amount").toString();
 
         produceToTopic(numberValue);
 
@@ -34,7 +34,7 @@ public class SalesService extends HttpServlet {
 
     private void produceToTopic(String value) {
         final String topicName = "streams-plaintext-input";
-        final String key = "test";
+        final String key = "sale";
         Properties props = getProperties();
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
         try {
