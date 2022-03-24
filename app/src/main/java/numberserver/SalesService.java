@@ -33,7 +33,7 @@ public class SalesService extends HttpServlet {
     }
 
     private void produceToTopic(String value) {
-        final String topicName = "streams-pipe-input";
+        final String topicName = "streams-plaintext-input";
         final String key = "test";
         Properties props = getProperties();
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
