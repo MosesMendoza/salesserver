@@ -1,9 +1,8 @@
-# numberserver
+# salesserver
 
-This actually isn't a number server. This is a playground app for bridging a
-REST API -> kafka topic in java. The idea is that this service takes incoming
-requests, and publishes them to a kafka topic, where presumably other work can
-be done from it.
+This is a playground app for bridging a REST API -> kafka topic in java. The
+idea is that this service takes incoming requests, and publishes them to a kafka
+topic, where presumably other work can be done from it.
 
 The "service" we're building here is a sales tracker. When a sale happens, that
 sale event is posted to this service, which writes the sale to a kafka topic.
