@@ -7,23 +7,22 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.HashMap;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import java.util.stream.*;
-import java.util.Arrays;
 
 public class SalesService extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String body = request.getReader().lines().collect(Collectors.joining());
         JSONObject jsonBody = new JSONObject(body);
-        String numberValue = jsonBody.get("amount").toString();
+        // leave these as strings since we're just putting them on kafka as strings for nwo
+        String saleAmount = jsonBody.get("amount").toString();
+        String stateAbbreviation = jsonBody.get("state_abbreviation").toString();
 
-        produceToTopic(numberValue);
+        produceToTopic(saleAmount, stateAbbreviation);
 
         response.setStatus(200);
         response.setContentType("text/html; charset=UTF-8");
@@ -37,14 +36,14 @@ public class SalesService extends HttpServlet {
         return props;
     }
 
-    private void produceToTopic(String value) {
+    private void produceToTopic(String amount, String stateAbbreviation) {
         final String topicName = "streams-plaintext-input";
         final String key = "sale";
 
         final Map<String, String> valueDictionary = new HashMap<String, String>();
 
-        valueDictionary.put("amount", value);
-        valueDictionary.put("state_abbreviation", "WA");
+        valueDictionary.put("amount", amount);
+        valueDictionary.put("state_abbreviation", stateAbbreviation);
 
         Properties props = getProperties();
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
