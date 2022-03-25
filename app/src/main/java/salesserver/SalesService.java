@@ -1,4 +1,4 @@
-package numberserver;
+package salesserver;
 
 import java.io.IOException;
 import java.util.stream.Collectors;

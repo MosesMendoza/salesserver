@@ -1,4 +1,4 @@
-package numberserver;
+package salesserver;
 
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
