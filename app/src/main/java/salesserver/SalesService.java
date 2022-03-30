@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Properties;
 import java.util.Map;
-import java.util.HashMap;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -18,17 +17,15 @@ public class SalesService extends HttpServlet {
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String body = request.getReader().lines().collect(Collectors.joining());
         JSONObject jsonBody = new JSONObject(body);
-        // leave these as strings since we're just putting them on kafka as strings for nwo
-        String saleAmount = jsonBody.get("amount").toString();
-        String stateAbbreviation = jsonBody.get("state_abbreviation").toString();
+        Sale sale = parseSaleFromBody(jsonBody);
 
-        produceToTopic(saleAmount, stateAbbreviation);
+        produceToTopic(sale.toMap());
 
         response.setStatus(200);
         response.setContentType("text/html; charset=UTF-8");
     }
 
-    private Properties getProperties() {
+    private static Properties getProperties() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -36,19 +33,22 @@ public class SalesService extends HttpServlet {
         return props;
     }
 
-    private void produceToTopic(String amount, String stateAbbreviation) {
+    private Sale parseSaleFromBody(JSONObject body) {
+        // leave these as strings since we're just putting them on kafka as strings for nwo
+        String saleAmount = body.get("amount").toString();
+        String stateAbbreviation = body.get("state_abbreviation").toString();
+
+        return new Sale(saleAmount, stateAbbreviation);
+    }
+
+    private void produceToTopic(Map<String, String>map) {
         final String topicName = "streams-plaintext-input";
         final String key = "sale";
 
-        final Map<String, String> valueDictionary = new HashMap<String, String>();
-
-        valueDictionary.put("amount", amount);
-        valueDictionary.put("state_abbreviation", stateAbbreviation);
-
-        Properties props = getProperties();
+        Properties props = SalesService.getProperties();
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props);
         try {
-            ProducerRecord<String, String> record = new ProducerRecord<>(topicName, key, new JSONObject(valueDictionary).toString());
+            ProducerRecord<String, String> record = new ProducerRecord<>(topicName, key, new JSONObject(map).toString());
             producer.send(record);
             producer.close();
         }
